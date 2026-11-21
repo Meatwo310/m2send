@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>m2send</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <main>
+    <h1>m2send</h1>
+    <p class="muted">テキストやファイルを端末内で暗号化します。</p>
+
+    <nav aria-label="操作">
+      <button type="button" data-panel="receive" aria-controls="receive" aria-pressed="true">受け取る</button>
+      <button type="button" data-panel="send" aria-controls="send" aria-pressed="false">送る</button>
+    </nav>
+
+    <section id="receive" aria-label="受け取る">
+      <h2>受信用の鍵</h2>
+      <button type="button" id="create-key">鍵を作る</button>
+      <div id="key-info" hidden>
+        <label for="share-link">送信用リンク</label>
+        <div class="row">
+          <input id="share-link" type="text" readonly>
+          <button type="button" id="copy-link">コピー</button>
+        </div>
+        <p class="muted">リンクを送信者に渡してください。タブを閉じる場合は、先に秘密鍵を保存してください。</p>
+        <details>
+          <summary>公開鍵の指紋を表示</summary>
+          <code id="own-fingerprint"></code>
+        </details>
+        <div class="row">
+          <button type="button" id="save-key">秘密鍵を保存</button>
+          <button type="button" id="clear-key">鍵を破棄</button>
+        </div>
+      </div>
+
+      <form id="decrypt">
+        <h2>復号する</h2>
+        <div id="key-file-field">
+          <label for="key-file">秘密鍵ファイル（このタブに鍵がない場合）</label>
+          <input id="key-file" type="file" accept=".pem,application/x-pem-file">
+        </div>
+        <label for="decrypt-kind">暗号文の入力</label>
+        <select id="decrypt-kind">
+          <option value="text">暗号文を貼り付け</option>
+          <option value="file">暗号化ファイル</option>
+        </select>
+        <div id="decrypt-text-field">
+          <label for="decrypt-text">暗号文（PEM）</label>
+          <textarea id="decrypt-text" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        </div>
+        <div id="decrypt-file-field" hidden>
+          <label for="decrypt-file">暗号化ファイル（DER または PEM）</label>
+          <input id="decrypt-file" type="file">
+        </div>
+        <button type="submit" disabled>復号する</button>
+      </form>
+      <div id="decrypted" class="result" hidden>
+        <label for="decrypted-text" id="decrypted-label">復号したテキスト</label>
+        <textarea id="decrypted-text" rows="4" readonly></textarea>
+        <button type="button" id="save-plaintext">復号したデータを保存</button>
+      </div>
+    </section>
+
+    <section id="send" aria-label="送る" hidden>
+      <form id="encrypt">
+        <label for="recipient">宛先（送信用リンクまたは公開証明書 PEM）</label>
+        <textarea id="recipient" rows="3" required spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        <details id="recipient-details" hidden>
+          <summary>公開鍵の指紋を表示</summary>
+          <code id="recipient-fingerprint"></code>
+        </details>
+        <label for="encrypt-kind">送るデータ</label>
+        <select id="encrypt-kind">
+          <option value="text">テキスト</option>
+          <option value="file">ファイル</option>
+        </select>
+        <div id="encrypt-text-field">
+          <label for="encrypt-text">テキスト</label>
+          <textarea id="encrypt-text" rows="5" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        </div>
+        <div id="encrypt-file-field" hidden>
+          <label for="encrypt-file">ファイル（最大 16 MiB）</label>
+          <input id="encrypt-file" type="file">
+        </div>
+        <button type="submit" disabled>暗号化する</button>
+      </form>
+      <div id="encrypted" class="result" hidden>
+        <label id="encrypted-label" for="encrypted-text">暗号文（PEM）</label>
+        <textarea id="encrypted-text" rows="4" readonly></textarea>
+        <div class="row">
+          <button type="button" id="copy-ciphertext">暗号文をコピー</button>
+          <button type="button" id="save-ciphertext">暗号化ファイルを保存</button>
+        </div>
+      </div>
+    </section>
+
+    <p id="status" role="status"></p>
+    <noscript>利用するには JavaScript を有効にしてください。</noscript>
+  </main>
+</body>
+</html>
